@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Jeremy.Tools.Helpers;
 
 namespace Jeremy.Tools.Extensions
 {
     /// <summary>
     /// 列表对象扩展
     /// </summary>
-    public static class ListExtension
+    public static class ListHelper
     {
         /// <summary>
         /// 移除当前列表中所包含的空项

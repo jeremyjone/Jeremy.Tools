@@ -12,16 +12,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Jeremy.Tools.Repository
 {
-    public abstract class BaseRepository<TEntity, TContext, TRepository> : Repository<TContext, TRepository>, IBaseRepository<TEntity>
+    public class BaseRepository<TEntity, TContext, TRepository> : Repository<TContext, TRepository>, IBaseRepository<TEntity>
         where TEntity : class
         where TContext : DbContext
         where TRepository : IBaseRepository<TEntity>
     {
+
+        #region 查
+
         protected BaseRepository(TContext db, ILogger<TRepository> logger) : base(db, logger)
         {
         }
-
-        #region 查
 
         public virtual TEntity Get(Expression<Func<TEntity, bool>> expression)
         {
@@ -41,47 +42,6 @@ namespace Jeremy.Tools.Repository
         public virtual async Task<List<TEntity>> GetRangeAsync(Expression<Func<TEntity, bool>> expression = null)
         {
             return await Db.Set<TEntity>().WhereIf(expression != null, expression).ToListAsync();
-        }
-
-        public virtual PageList<TEntity> GetRange<TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, int page = 1, int pageSize = 10,
-            bool isDescending = false)
-        {
-            var res = Db.Set<TEntity>().Where(expression).PageBy(orderBy, page, pageSize, isDescending).ToList();
-            return res.ToPageList(res.Count, pageSize);
-        }
-
-        public virtual async Task<PageList<TEntity>> GetRangeAsync<TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, int page = 1, int pageSize = 10, bool isDescending = false)
-        {
-            return (await Db.Set<TEntity>().Where(expression).PageBy(orderBy, page, pageSize, isDescending).ToListAsync())
-                .ToPageList(await Db.Set<TEntity>().Where(expression).CountAsync(), pageSize);
-        }
-
-        public async Task<PageList<TEntity>> GetRangeAsync<TParam, TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, TParam param = null, int page = 1, int pageSize = 10,
-            bool isDescending = false) where TParam : class
-        {
-            var res = await Db.Set<TEntity>().Where(expression).ToListAsync();
-            if (param != null)
-                res = param.ToDictionary()
-                    .Aggregate(res, (current, o) => current
-                        .Where(x => Equals(x.GetType().GetProperty(o.Key)?.GetValue(x), o.Value)).AsQueryable()
-                        .PageBy(orderBy, page, pageSize, isDescending)
-                        .ToList());
-
-            return res.ToPageList(res.Count, pageSize);
-        }
-
-        public abstract Task<PageList<TEntity>> GetRangeAsync(Expression<Func<TEntity, bool>> expression, int page,
-            int pageSize = 10);
-
-        public virtual async Task<TAccessory> GetAccessoryAsync<TAccessory>(Expression<Func<TAccessory, bool>> expression, Expression<Func<TAccessory, TEntity>> includeExpression = null) where TAccessory : class, new()
-        {
-            return await Db.Set<TAccessory>().IncludeIf(includeExpression).FirstOrDefaultAsync(expression);
-        }
-
-        public virtual async Task<PageList<TAccessory>> GetAccessoryRangeAsync<TAccessory, TKey>(Expression<Func<TAccessory, bool>> expression, Expression<Func<TAccessory, TKey>> orderBy, int page, int pageSize) where TAccessory : class, new()
-        {
-            return (await Db.Set<TAccessory>().Where(expression).PageBy(orderBy, page, pageSize).ToListAsync())
-                .ToPageList(await Db.Set<TAccessory>().Where(expression).CountAsync(), pageSize);
         }
 
         #endregion
@@ -120,12 +80,6 @@ namespace Jeremy.Tools.Repository
                 await Db.Set<TEntity>().AddRangeAsync(entities);
             }
 
-            return await Db.SaveChangesAsync() > 0;
-        }
-
-        public async Task<bool> AddAccessoryAsync<TAccessory>(TAccessory entity) where TAccessory : class, new()
-        {
-            if (entity != null) await Db.Set<TAccessory>().AddAsync(entity);
             return await Db.SaveChangesAsync() > 0;
         }
 
@@ -223,20 +177,6 @@ namespace Jeremy.Tools.Repository
                 Db.Set<TEntity>().RemoveRange(entities);
             }
 
-            return await Db.SaveChangesAsync() > 0;
-        }
-
-        public async Task<bool> DeleteAccessoryAsync<TAccessory>(TAccessory entity) where TAccessory : class, new()
-        {
-            if (entity != null) Db.Set<TAccessory>().Remove(entity);
-
-            return await Db.SaveChangesAsync() > 0;
-        }
-
-        public async Task<bool> DeleteAccessoryAsync<TAccessory>(Expression<Func<TAccessory, bool>> expression) where TAccessory : class, new()
-        {
-            var entity = await GetAccessoryAsync(expression);
-            if (entity != null) Db.Set<TAccessory>().Remove(entity);
             return await Db.SaveChangesAsync() > 0;
         }
 

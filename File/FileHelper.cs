@@ -1,10 +1,10 @@
-﻿using Jeremy.Tools.Extensions;
-using Jeremy.Tools.Net;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
+using Jeremy.Tools.Common;
+using Jeremy.Tools.Extensions;
 
 namespace Jeremy.Tools.File
 {
@@ -66,7 +66,7 @@ namespace Jeremy.Tools.File
             try
             {
                 var bytes = new byte[contents.Length];
-                await contents.ReadAsync(bytes, 0, bytes.Length);
+                await contents.ReadAsync(bytes.AsMemory(0, bytes.Length));
                 contents.Seek(0, SeekOrigin.Begin);
                 var fs = new FileStream(path, isAppend ? FileMode.Append : FileMode.Create, FileAccess.Write);
                 var bw = new BinaryWriter(fs, encoding);

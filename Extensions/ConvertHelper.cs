@@ -1,6 +1,9 @@
-﻿using Jeremy.Tools.Json;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using Jeremy.Tools.Helpers;
+using Jeremy.Tools.Json;
 
 namespace Jeremy.Tools.Extensions
 {
@@ -143,6 +146,19 @@ namespace Jeremy.Tools.Extensions
         public static byte[] ToBytes(this string value)
         {
             return Encoding.UTF8.GetBytes(value);
+        }
+
+        /// <summary>
+        /// 将一个对象的属性值转化为键值对字典
+        /// </summary>
+        /// <param name="value">待转换的对象</param>
+        /// <param name="ignoreEmpty">忽略空值</param>
+        /// <returns></returns>
+        public static Dictionary<string, object> ToDictionary<T>(this T value, bool ignoreEmpty = true) where T : class
+        {
+            return value.GetType().GetProperties().OrderBy(x => x.Name)
+                .Where(x => !ignoreEmpty || !Utils.IsNullOrEmpty(x.GetValue(value)))
+                .ToDictionary(x => x.Name, x => x.GetValue(value));
         }
     }
 }

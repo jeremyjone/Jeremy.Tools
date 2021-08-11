@@ -1,6 +1,6 @@
-﻿using Jeremy.Tools.Extensions;
-using System;
+﻿using System;
 using System.Text.Json;
+using Jeremy.Tools.Extensions;
 
 namespace Jeremy.Tools.Json
 {

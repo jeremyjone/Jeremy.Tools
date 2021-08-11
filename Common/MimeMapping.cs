@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Jeremy.Tools.Net
+namespace Jeremy.Tools.Common
 {
     /// <summary>
-    /// 使用文件类型获得文件对应的Mime类型，并保存到数据库
+    /// 文件Mime类型映射
     /// </summary>
     public static class MimeMapping
     {

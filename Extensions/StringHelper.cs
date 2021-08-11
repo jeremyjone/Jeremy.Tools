@@ -9,7 +9,7 @@ namespace Jeremy.Tools.Extensions
     /// <summary>
     /// 对字符串的扩展操作类
     /// </summary>
-    public static class StringExtension
+    public static class StringHelper
     {
         /// <summary>
         /// 检查一个字符串是否为正确的 base64
