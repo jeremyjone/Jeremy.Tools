@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 
 namespace Jeremy.Tools.Net
 {
-    public class HttpHelper
+    public static class HttpHelper
     {
         private static readonly Encoding EncodingType = Encoding.UTF8;
 
@@ -71,10 +72,8 @@ namespace Jeremy.Tools.Net
             httpResult.Status = Status.Success;
             httpResult.HttpStatusCode = (int)webResponse.StatusCode;
 
-            using (var sr = new StreamReader(webResponse.GetResponseStream() ?? throw new InvalidOperationException(), EncodingType))
-            {
-                httpResult.Data = sr.ReadToEnd();
-            }
+            using var sr = new StreamReader(webResponse.GetResponseStream(), EncodingType);
+            httpResult.Data = sr.ReadToEnd();
 
             webResponse.Close();
         }
@@ -92,10 +91,8 @@ namespace Jeremy.Tools.Net
             httpResult.Status = Status.Fail;
             httpResult.HttpStatusCode = (int)exResponse.StatusCode;
 
-            using (var sr = new StreamReader(exResponse.GetResponseStream() ?? throw new InvalidOperationException(), EncodingType))
-            {
-                httpResult.Data = sr.ReadToEnd();
-            }
+            using var sr = new StreamReader(exResponse.GetResponseStream(), EncodingType);
+            httpResult.Data = sr.ReadToEnd();
 
             exResponse.Close();
         }
@@ -125,6 +122,19 @@ namespace Jeremy.Tools.Net
         }
 
         /// <summary>
+        /// 通用的Get方法
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        /// <param name="param"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public static HttpResult Get<T>(string url, T param, string token = null) where T : class, new()
+        {
+            return Request(url + param.ToUrlParams(), WebRequestMethods.Http.Get, null, token);
+        }
+
+        /// <summary>
         /// 通用的Post方法
         /// </summary>
         /// <param name="url"></param>
@@ -134,6 +144,35 @@ namespace Jeremy.Tools.Net
         public static HttpResult Post(string url, string body = "", string token = null)
         {
             return Request(url, WebRequestMethods.Http.Post, body, token);
+        }
+
+        public static HttpResult Post<T>(string url, T param, string body = "", string token = null) where T : class, new()
+        {
+            return Request(url + param.ToUrlParams(), WebRequestMethods.Http.Post, body, token);
+        }
+
+        /// <summary>
+        /// 转换一个参数对象为对应的字符串，以连接 URL
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        private static string ToUrlParams<T>(this T param) where T : class, new()
+        {
+            var properties = param.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var sb = new StringBuilder("?");
+            foreach (var p in properties)
+            {
+                var v = p.GetValue(param, null) ?? "";
+
+                // 字符串需要转译
+                sb.Append($"{p.Name}={Uri.EscapeDataString(v.ToString())}&");
+            }
+
+            // 删除最后一个 '&'
+            sb.Remove(sb.Length - 1, 1);
+
+            return sb.ToString();
         }
     }
 }
