@@ -5,6 +5,12 @@
     /// </summary>
     public enum Status
     {
+
+        /// <summary>
+        /// 成功
+        /// </summary>
+        Success,
+
         /// <summary>
         /// 失败，网络问题
         /// </summary>
@@ -13,11 +19,6 @@
         /// <summary>
         /// 错误，本地问题
         /// </summary>
-        Error,
-
-        /// <summary>
-        /// 成功
-        /// </summary>
-        Success,
+        Error
     }
 }

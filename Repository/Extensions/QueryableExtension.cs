@@ -11,7 +11,7 @@ namespace Jeremy.Tools.Repository.Extensions
         /// 按条件排序，默认逆向排序。然后根据页码和每页大小获取指定内容。<br />
         /// 【注意】 在使用该查询之前需要先筛选实体内容，否则可能导致获取内容不正确。
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TKey"></typeparam>
         /// <param name="query">实体序列</param>
         /// <param name="orderBy">排序条件表达式</param>
@@ -20,7 +20,7 @@ namespace Jeremy.Tools.Repository.Extensions
         /// <param name="isDescending">排序方向。默认逆序</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
-        public static IQueryable<T> PageBy<T, TKey>(this IQueryable<T> query, Expression<Func<T, TKey>> orderBy,
+        public static IQueryable<TEntity> PagedBy<TEntity, TKey>(this IQueryable<TEntity> query, Expression<Func<TEntity, TKey>> orderBy,
             int page, int pageSize, bool isDescending = true)
         {
             if (query == null) throw new ArgumentNullException(nameof(query), "Query contents can not be null.");
@@ -58,6 +58,36 @@ namespace Jeremy.Tools.Repository.Extensions
         {
             if (query == null) throw new ArgumentNullException(nameof(query), "Query contents can not be null.");
             return condition ? query.Where(expression) : query;
+        }
+
+        /// <summary>
+        /// 按条件选择正序排序或者倒序排序
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="isDescending"></param>
+        /// <returns></returns>
+        public static IOrderedQueryable<TEntity> OrderByIf<TEntity, TKey>(this IQueryable<TEntity> query, Expression<Func<TEntity, TKey>> orderBy, bool isDescending = false)
+        {
+            if (query == null) throw new ArgumentNullException(nameof(query), "Query contents can not be null.");
+            return isDescending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
+        }
+
+        /// <summary>
+        /// 按条件选择正序排序或者倒序排序
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="isDescending"></param>
+        /// <returns></returns>
+        public static IOrderedQueryable<TEntity> ThenByIf<TEntity, TKey>(this IOrderedQueryable<TEntity> query, Expression<Func<TEntity, TKey>> orderBy, bool isDescending = false)
+        {
+            if (query == null) throw new ArgumentNullException(nameof(query), "Query contents can not be null.");
+            return isDescending ? query.ThenByDescending(orderBy) : query.ThenBy(orderBy);
         }
     }
 }

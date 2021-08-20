@@ -16,7 +16,7 @@ namespace Jeremy.Tools.Extensions
         /// </summary>
         /// <param name="base64"></param>
         /// <returns></returns>
-        public static bool CheckBase64(this string base64)
+        public static bool IsBase64(this string base64)
         {
             return base64.Length % 4 == 0;
         }

@@ -24,7 +24,7 @@ namespace Jeremy.Tools.Repository.Interfaces
         /// <param name="pageSize">每页数据的数量，默认10</param>
         /// <param name="isDescending">是否倒序。默认正序</param>
         /// <returns></returns>
-        PageList<TEntity> GetRange<TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, int page = 1, int pageSize = 10, bool isDescending = false);
+        PagedList<TEntity> GetRange<TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, int page = 1, int pageSize = 10, bool isDescending = false);
 
         /// <summary>
         /// 获取指定条件下当前页的内容
@@ -35,7 +35,7 @@ namespace Jeremy.Tools.Repository.Interfaces
         /// <param name="page">页数</param>
         /// <param name="pageSize">每页数据的数量，默认10</param>
         /// <param name="isDescending">是否倒序。默认正序</param>
-        Task<PageList<TEntity>> GetRangeAsync<TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, int page = 1, int pageSize = 10, bool isDescending = false);
+        Task<PagedList<TEntity>> GetRangeAsync<TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, int page = 1, int pageSize = 10, bool isDescending = false);
 
         /// <summary>
         /// 获取指定条件下当前页的内容
@@ -49,21 +49,21 @@ namespace Jeremy.Tools.Repository.Interfaces
         /// <param name="pageSize">每页数据的数量，默认10</param>
         /// <param name="isDescending">是否倒序。默认正序</param>
         /// <returns></returns>
-        Task<PageList<TEntity>> GetRangeAsync<TParam, TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, TParam param = null, int page = 1, int pageSize = 10, bool isDescending = false) where TParam : class;
+        Task<PagedList<TEntity>> GetRangeAsync<TParam, TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, TParam param = null, int page = 1, int pageSize = 10, bool isDescending = false) where TParam : class;
 
         /// <summary>
-        /// 【该方法是自定义方法，需要自行重载】自定义获取指定条件下当前页的内容<br />
+        /// 【该方法是自定义方法，需要自行实现】自定义获取指定条件下当前页的内容<br />
         /// 用户可以通过调用 Db.Set&lt;TEntity&gt; 的方法来获取需要的数据。Db 对象是 Repository 中设定好的。<br />
         /// </summary>
         /// <remarks>
-        /// 分页结果可以在查询结果最后调用 <see cref="EnumerableExtension.ToPageList">ToPageList(int totalCount, int pageSize)</see> 扩展方法将其转换。<br />
-        /// 如：Db.Set&lt;TEntity&gt;.Where(expression).<see cref="QueryableExtension.PageBy">PageBy</see>(x => x.Id, page, pageSize).<see cref="EnumerableExtension.ToPageList">ToPageList</see>(await Db.Set&lt;TEntity&gt;.Where(expression).CountAsync(), pageSize);
+        /// 分页结果可以在查询结果最后调用 <see cref="EnumerableExtension.ToPagedList{TEntity}">ToPagedList(int totalCount, int pageSize)</see> 扩展方法将其转换。<br />
+        /// 如：Db.Set&lt;TEntity&gt;.Where(expression).<see cref="QueryableExtension.PagedBy{T,TKey}">PagedBy</see>(x => x.Id, page, pageSize).<see cref="EnumerableExtension.ToPagedList{TEntity}">ToPagedList</see>(await Db.Set&lt;TEntity&gt;.Where(expression).CountAsync(), pageSize);
         /// </remarks>
         /// <param name="expression">筛选条件</param>
         /// <param name="page">页数</param>
         /// <param name="pageSize">每页数据的数量，默认10</param>
         /// <returns></returns>
-        Task<PageList<TEntity>> GetRangeAsync(Expression<Func<TEntity, bool>> expression, int page, int pageSize = 10);
+        Task<PagedList<TEntity>> GetRangeAsync(Expression<Func<TEntity, bool>> expression, int page, int pageSize = 10);
 
         /// <summary>
         /// 通过当前仓库查询其他指定附属类型的数据。当附属条件为 null 时，查询数据与普通无异。<br />
@@ -85,7 +85,7 @@ namespace Jeremy.Tools.Repository.Interfaces
         /// <param name="page">页数</param>
         /// <param name="pageSize">每页数据的数量，默认10</param>
         /// <returns></returns>
-        Task<PageList<TAccessory>> GetAccessoryRangeAsync<TAccessory, TKey>(Expression<Func<TAccessory, bool>> expression, Expression<Func<TAccessory, TKey>> orderBy, int page, int pageSize) where TAccessory : class, new();
+        Task<PagedList<TAccessory>> GetAccessoryRangeAsync<TAccessory, TKey>(Expression<Func<TAccessory, bool>> expression, Expression<Func<TAccessory, TKey>> orderBy, int page, int pageSize) where TAccessory : class, new();
 
         #endregion
 

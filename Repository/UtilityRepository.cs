@@ -23,22 +23,22 @@ namespace Jeremy.Tools.Repository
 
         #region 查
 
-        public virtual PageList<TEntity> GetRange<TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, int page = 1, int pageSize = 10,
+        public virtual PagedList<TEntity> GetRange<TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, int page = 1, int pageSize = 10,
             bool isDescending = false)
         {
-            var res = Db.Set<TEntity>().Where(expression).PageBy(orderBy, page, pageSize, isDescending).ToList();
-            return res.ToPageList(res.Count, pageSize);
+            var res = Db.Set<TEntity>().Where(expression).PagedBy(orderBy, page, pageSize, isDescending).ToList();
+            return res.ToPagedList(res.Count, pageSize);
         }
 
-        public virtual async Task<PageList<TEntity>> GetRangeAsync<TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, int page = 1, int pageSize = 10, bool isDescending = false)
+        public virtual async Task<PagedList<TEntity>> GetRangeAsync<TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, int page = 1, int pageSize = 10, bool isDescending = false)
         {
             return Db.Set<TEntity>()
                 .Where(expression)
-                .PageBy(orderBy, page, pageSize, isDescending)
-                .ToPageList(await Db.Set<TEntity>().Where(expression).CountAsync(), pageSize);
+                .PagedBy(orderBy, page, pageSize, isDescending)
+                .ToPagedList(await Db.Set<TEntity>().Where(expression).CountAsync(), pageSize);
         }
 
-        public async Task<PageList<TEntity>> GetRangeAsync<TParam, TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, TParam param = null, int page = 1, int pageSize = 10,
+        public async Task<PagedList<TEntity>> GetRangeAsync<TParam, TKey>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, TKey>> orderBy, TParam param = null, int page = 1, int pageSize = 10,
             bool isDescending = false) where TParam : class
         {
             var res = await Db.Set<TEntity>().Where(expression).ToListAsync();
@@ -46,24 +46,27 @@ namespace Jeremy.Tools.Repository
                 res = param.ToDictionary()
                     .Aggregate(res, (current, o) => current
                         .Where(x => Equals(x.GetType().GetProperty(o.Key)?.GetValue(x), o.Value)).AsQueryable()
-                        .PageBy(orderBy, page, pageSize, isDescending)
+                        .PagedBy(orderBy, page, pageSize, isDescending)
                         .ToList());
 
-            return res.ToPageList(res.Count, pageSize);
+            return res.ToPagedList(res.Count, pageSize);
         }
 
-        public abstract Task<PageList<TEntity>> GetRangeAsync(Expression<Func<TEntity, bool>> expression, int page,
+        public abstract Task<PagedList<TEntity>> GetRangeAsync(Expression<Func<TEntity, bool>> expression, int page,
             int pageSize = 10);
 
         public virtual async Task<TAccessory> GetAccessoryAsync<TAccessory>(Expression<Func<TAccessory, bool>> expression, Expression<Func<TAccessory, TEntity>> includeExpression = null) where TAccessory : class, new()
         {
-            return await Db.Set<TAccessory>().IncludeIf(includeExpression).FirstOrDefaultAsync(expression);
+            var accessory = Db.Set<TAccessory>().AsQueryable();
+            if (includeExpression != null) accessory = accessory.Include(includeExpression);
+
+            return await accessory.FirstOrDefaultAsync(expression);
         }
 
-        public virtual async Task<PageList<TAccessory>> GetAccessoryRangeAsync<TAccessory, TKey>(Expression<Func<TAccessory, bool>> expression, Expression<Func<TAccessory, TKey>> orderBy, int page, int pageSize) where TAccessory : class, new()
+        public virtual async Task<PagedList<TAccessory>> GetAccessoryRangeAsync<TAccessory, TKey>(Expression<Func<TAccessory, bool>> expression, Expression<Func<TAccessory, TKey>> orderBy, int page, int pageSize) where TAccessory : class, new()
         {
-            return (await Db.Set<TAccessory>().Where(expression).PageBy(orderBy, page, pageSize).ToListAsync())
-                .ToPageList(await Db.Set<TAccessory>().Where(expression).CountAsync(), pageSize);
+            return (await Db.Set<TAccessory>().Where(expression).PagedBy(orderBy, page, pageSize).ToListAsync())
+                .ToPagedList(await Db.Set<TAccessory>().Where(expression).CountAsync(), pageSize);
         }
 
         #endregion

@@ -17,12 +17,11 @@ namespace Jeremy.Tools.Repository
         where TContext : DbContext
         where TRepository : IBaseRepository<TEntity>
     {
-
-        #region 查
-
         protected BaseRepository(TContext db, ILogger<TRepository> logger) : base(db, logger)
         {
         }
+
+        #region 查
 
         public virtual TEntity Get(Expression<Func<TEntity, bool>> expression)
         {

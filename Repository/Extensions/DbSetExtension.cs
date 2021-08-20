@@ -20,23 +20,5 @@ namespace Jeremy.Tools.Repository.Extensions
             var list = db.Where(expression);
             db.RemoveRange(list);
         }
-
-        /// <summary>
-        /// 当条件不为 null 时，按条件引用实体内容
-        /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="navigationPropertyPath"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <returns></returns>
-        public static IQueryable<TEntity> IncludeIf<TEntity, TProperty>(
-            this DbSet<TEntity> source,
-            Expression<Func<TEntity, TProperty>> navigationPropertyPath)
-            where TEntity : class
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source), "Source can not be null.");
-            return navigationPropertyPath == null ? source.AsQueryable() : source.Include(navigationPropertyPath);
-        }
     }
 }

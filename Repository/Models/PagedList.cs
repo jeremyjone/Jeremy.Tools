@@ -7,11 +7,11 @@ namespace Jeremy.Tools.Repository.Models
     /// 页列表对象
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class PageList<T> where T : class
+    public class PagedList<T> where T : class
     {
-        public PageList() { }
+        public PagedList() { }
 
-        public PageList(IEnumerable<T> items, int totalCount, int pageSize)
+        public PagedList(IEnumerable<T> items, int totalCount, int pageSize)
         {
             Items = items.ToList();
             TotalCount = totalCount;

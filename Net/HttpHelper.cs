@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Jeremy.Tools.Net
 {
@@ -18,7 +19,7 @@ namespace Jeremy.Tools.Net
         /// <param name="method">请求的方法。请使用 WebRequestMethods.Http 的枚举值</param>
         /// <param name="token"></param>
         /// <returns></returns>
-        private static HttpResult Request(string url, string method, string data, string token)
+        private static async Task<HttpResult> RequestAsync(string url, string method, string data, string token)
         {
             var httpResult = new HttpResult();
             HttpWebRequest webRequest = null;
@@ -36,12 +37,12 @@ namespace Jeremy.Tools.Net
                 {
                     webRequest.AllowWriteStreamBuffering = true;
                     var d = EncodingType.GetBytes(data);
-                    using var requestStream = webRequest.GetRequestStream();
-                    requestStream.Write(d, 0, d.Length);
-                    requestStream.Flush();
+                    await using var requestStream = await webRequest.GetRequestStreamAsync();
+                    await requestStream.WriteAsync(d.AsMemory(0, d.Length));
+                    await requestStream.FlushAsync();
                 }
 
-                var webResponse = (HttpWebResponse)webRequest.GetResponse();
+                var webResponse = (HttpWebResponse)await webRequest.GetResponseAsync();
                 GetResponse(ref httpResult, webResponse);
                 webResponse.Close();
             }
@@ -116,22 +117,22 @@ namespace Jeremy.Tools.Net
         /// <param name="url"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static HttpResult Get(string url, string token = null)
+        public static async Task<HttpResult> GetAsync(string url, string token = null)
         {
-            return Request(url, WebRequestMethods.Http.Get, null, token);
+            return await RequestAsync(url, WebRequestMethods.Http.Get, null, token);
         }
 
         /// <summary>
         /// 通用的Get方法
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TParam"></typeparam>
         /// <param name="url"></param>
         /// <param name="param"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static HttpResult Get<T>(string url, T param, string token = null) where T : class, new()
+        public static async Task<HttpResult> GetAsync<TParam>(string url, TParam param, string token = null) where TParam : class
         {
-            return Request(url + param.ToUrlParams(), WebRequestMethods.Http.Get, null, token);
+            return await RequestAsync(url + param.ToUrlParams(), WebRequestMethods.Http.Get, null, token);
         }
 
         /// <summary>
@@ -141,14 +142,14 @@ namespace Jeremy.Tools.Net
         /// <param name="body"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static HttpResult Post(string url, string body = "", string token = null)
+        public static async Task<HttpResult> PostAsync(string url, string body = "", string token = null)
         {
-            return Request(url, WebRequestMethods.Http.Post, body, token);
+            return await RequestAsync(url, WebRequestMethods.Http.Post, body, token);
         }
 
-        public static HttpResult Post<T>(string url, T param, string body = "", string token = null) where T : class, new()
+        public static async Task<HttpResult> PostAsync<TParam>(string url, TParam param, string body = "", string token = null) where TParam : class
         {
-            return Request(url + param.ToUrlParams(), WebRequestMethods.Http.Post, body, token);
+            return await RequestAsync(url + param.ToUrlParams(), WebRequestMethods.Http.Post, body, token);
         }
 
         /// <summary>
@@ -157,7 +158,7 @@ namespace Jeremy.Tools.Net
         /// <typeparam name="T"></typeparam>
         /// <param name="param"></param>
         /// <returns></returns>
-        private static string ToUrlParams<T>(this T param) where T : class, new()
+        private static string ToUrlParams<T>(this T param) where T : class
         {
             var properties = param.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             var sb = new StringBuilder("?");

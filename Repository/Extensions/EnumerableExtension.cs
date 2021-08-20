@@ -46,10 +46,10 @@ namespace Jeremy.Tools.Repository.Extensions
         /// <param name="pageSize">单页长度</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
-        public static PageList<TEntity> ToPageList<TEntity>(this IEnumerable<TEntity> list, int totalCount, int pageSize) where TEntity : class
+        public static PagedList<TEntity> ToPagedList<TEntity>(this IEnumerable<TEntity> list, int totalCount, int pageSize) where TEntity : class
         {
             if (list == null) throw new ArgumentNullException(nameof(list), "Contents can not be null.");
-            return new PageList<TEntity>(list, totalCount, pageSize);
+            return new PagedList<TEntity>(list, totalCount, pageSize);
         }
     }
 }

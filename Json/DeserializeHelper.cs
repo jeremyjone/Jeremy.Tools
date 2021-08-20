@@ -35,7 +35,7 @@ namespace Jeremy.Tools.Json
         /// 反序列化一个 json 到指定类型的对象
         /// </summary>
         /// <typeparam name="T">反序列的对象类型</typeparam>
-        /// <param name="value">json 格式内容</param>
+        /// <param name="value">json 格式的字符数组</param>
         /// <returns></returns>
         public static T Deserialize<T>(this byte[] value)
         {

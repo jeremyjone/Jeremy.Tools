@@ -53,6 +53,13 @@ namespace Jeremy.Tools.File
 
         #region 写入
 
+        /// <summary>
+        /// 将指定内容写入到文件中。
+        /// </summary>
+        /// <param name="path">文件路径，含文件名</param>
+        /// <param name="contents">文件内容</param>
+        /// <param name="isAppend">是否追加</param>
+        /// <param name="encoding">指定编码格式</param>
         protected static async void WriteContentsToFile(string path, Stream contents, bool isAppend, Encoding encoding)
         {
             CreateDir(Path.GetDirectoryName(path));
@@ -81,6 +88,13 @@ namespace Jeremy.Tools.File
             }
         }
 
+        /// <summary>
+        /// 将指定内容写入到文件中。
+        /// </summary>
+        /// <param name="path">文件路径，含文件名</param>
+        /// <param name="contents">文件内容</param>
+        /// <param name="isAppend">是否追加</param>
+        /// <param name="encoding">指定编码格式</param>
         protected static async void WriteContentsToFile(string path, string contents, bool isAppend, Encoding encoding)
         {
             CreateDir(Path.GetDirectoryName(path));
