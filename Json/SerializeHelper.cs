@@ -11,18 +11,20 @@ namespace Jeremy.Tools.Json
         /// 序列化一个对象
         /// </summary>
         /// <param name="value">待序列化的对象</param>
+        /// <param name="options">允许自定义参数</param>
         /// <exception cref="JsonSerializeException"></exception>
         /// <returns></returns>
-        public static string Serialize<T>(this T value) where T : class
+        public static string Serialize<T>(this T value, JsonSerializerOptions options = null) where T : class
         {
-            var options = new JsonSerializerOptions
+            var opt = options ?? new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
             };
 
             try
             {
-                return JsonSerializer.Serialize(value, options);
+                return JsonSerializer.Serialize(value, opt);
             }
             catch (Exception e)
             {
@@ -36,12 +38,13 @@ namespace Jeremy.Tools.Json
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <param name="res">返回的结果（如果提供）</param>
+        /// <param name="options">允许自定义参数</param>
         /// <returns></returns>
-        public static string SerializeSafety<T>(this T value, string res = null) where T : class
+        public static string SerializeSafety<T>(this T value, string res = null, JsonSerializerOptions options = null) where T : class
         {
             try
             {
-                return Serialize(value);
+                return Serialize(value, options);
             }
             catch (Exception)
             {

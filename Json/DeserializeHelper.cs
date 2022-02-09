@@ -11,19 +11,21 @@ namespace Jeremy.Tools.Json
         /// </summary>
         /// <typeparam name="T">反序列的对象类型</typeparam>
         /// <param name="value">json 字符串</param>
+        /// <param name="options">允许自定义参数</param>
         /// <exception cref="JsonDeserializeException"></exception>
         /// <returns></returns>
-        public static T Deserialize<T>(this string value)
+        public static T Deserialize<T>(this string value, JsonSerializerOptions options = null)
         {
             if (string.IsNullOrWhiteSpace(value)) value = new { }.ToString();
-            var options = new JsonSerializerOptions
+            var opt = options ?? new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
             };
 
             try
             {
-                return JsonSerializer.Deserialize<T>(value, options);
+                return JsonSerializer.Deserialize<T>(value, opt);
             }
             catch (Exception e)
             {
@@ -36,19 +38,21 @@ namespace Jeremy.Tools.Json
         /// </summary>
         /// <typeparam name="T">反序列的对象类型</typeparam>
         /// <param name="value">json 格式的字符数组</param>
+        /// <param name="options">允许自定义参数</param>
         /// <returns></returns>
-        public static T Deserialize<T>(this byte[] value)
+        public static T Deserialize<T>(this byte[] value, JsonSerializerOptions options = null)
         {
             if (value.Length == 0) value = new { }.ToBytes();
-            var options = new JsonSerializerOptions
+            var opt = options ?? new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
             };
             var readOnlySpan = new ReadOnlySpan<byte>(value);
 
             try
             {
-                return JsonSerializer.Deserialize<T>(readOnlySpan, options);
+                return JsonSerializer.Deserialize<T>(readOnlySpan, opt);
             }
             catch (Exception e)
             {
@@ -62,12 +66,13 @@ namespace Jeremy.Tools.Json
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <param name="res"></param>
+        /// <param name="options">允许自定义参数</param>
         /// <returns></returns>
-        public static T DeserializeSafety<T>(this string value, T res = null) where T : class, new()
+        public static T DeserializeSafety<T>(this string value, T res = null, JsonSerializerOptions options = null) where T : class, new()
         {
             try
             {
-                return Deserialize<T>(value);
+                return Deserialize<T>(value, options);
             }
             catch (Exception)
             {
@@ -81,12 +86,13 @@ namespace Jeremy.Tools.Json
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <param name="res"></param>
+        /// <param name="options">允许自定义参数</param>
         /// <returns></returns>
-        public static T DeserializeSafety<T>(this byte[] value, T res = null) where T : class, new()
+        public static T DeserializeSafety<T>(this byte[] value, T res = null, JsonSerializerOptions options = null) where T : class, new()
         {
             try
             {
-                return Deserialize<T>(value);
+                return Deserialize<T>(value, options);
             }
             catch (Exception)
             {
